@@ -1,4 +1,4 @@
-#define BUTTON_PIN  2
+#define BUTTON_PIN  A0
 #define ENABLE_PIXELS
 
 #include <MIDI.h>
@@ -15,7 +15,7 @@
 MIDI_CREATE_DEFAULT_INSTANCE();
 
 
-bool playing = false;
+bool playing = true;
 
 byte current_scene = 0;
 
@@ -94,6 +94,9 @@ void handleNoteOff(byte channel, byte pitch, byte velocity) {
 
 
 void setup() {
+  Serial.begin(9600);
+  Serial.println("resetting");
+  
   // put your setup code here, to run once:
 
 #ifdef ENABLE_PIXELS
@@ -130,11 +133,15 @@ void loop() {
 
   MIDI.read();
 
+  playing = true;
   if (playing) {
+    Serial.println("playing!");
     doScene[current_scene]();
     playing = false;  // stop playing after one interation of sequence
-    p_fill(CRGB(0, 0, 0),0,STRIP_NUM_PIXELS); //strip.Color(0, 0, 0, 1));  // clear the strip cos we've finished
+    p_clear();
     p_show();
-  } 
+  } else {
+    //Serial.println("looping..");
+  }
 
 }
