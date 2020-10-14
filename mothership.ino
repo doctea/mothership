@@ -1,5 +1,7 @@
-#define BUTTON_PIN  A0
+//#define BUTTON_PIN  A0
 #define ENABLE_PIXELS
+
+#define MIDI_NOTE_START 60
 
 #include <MIDI.h>
 
@@ -15,26 +17,25 @@
 MIDI_CREATE_DEFAULT_INSTANCE();
 
 
-bool playing = true;
+bool playing = false;
 
 byte current_scene = 0;
 
-
+#ifdef BUTTON_PIN
 void handleButtonPressed(uint8_t pin, uint8_t event, uint8_t count, uint16_t length) {
     if (event == EVENT_RELEASED) {
       playing = !playing; // toggle playing status
     }
 }
 
-#ifdef BUTTON_PIN
 DebounceEvent button = DebounceEvent(BUTTON_PIN, handleButtonPressed, BUTTON_PUSHBUTTON | BUTTON_DEFAULT_HIGH | BUTTON_SET_PULLUP);
 #endif
 
 
-void wait(int time) {
-  for (int i = 0 ; i < time ; i++) {
+void wait(long time) {
+  unsigned long mils = millis();
+  while (millis()-mils < time) {
     MIDI.read();
-    delay(1);
   }
 }
 
@@ -43,6 +44,7 @@ void wait(int time) {
 
 
 void handleNoteOn(byte channel, byte pitch, byte velocity) {
+  static int notes_received = 0;
   /*byte p = pitch;
   byte v = velocity;
 
@@ -62,16 +64,32 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
   // check if the incoming message is a trigger for a sequence, if so then 
   //  switch to it, or stop it if its already running
 
-  if (channel==10 // use channel 10 (drums) to trigger the preprogrammed sequences
-      && pitch < sizeof (SCENES_COUNT)  // and is a valid sequence number
-      )
-  {
-        if (!playing) {
-          current_scene = pitch;
-          playing = true;
-        } else {
-          playing = false;  // stop if already ongoing
-        }
+  if (velocity==0)
+    return;  // ignore if this is actually a note off
+
+  //pitch = velocity;
+  
+  if (pitch>=MIDI_NOTE_START) {
+    pitch -= MIDI_NOTE_START;  // so we can use C5 upwards as 0/1/2 are a bit fiddly...
+    //wait(1000);
+    if (//true || 
+        //channel==10 && // use channel 10 (drums) to trigger the preprogrammed sequences
+        pitch < SCENES_COUNT  // and is a valid sequence number
+        ) {
+          if (!playing) {
+            current_scene = pitch;
+            playing = true;
+          } else {
+            playing = false;  // stop if already ongoing
+          }
+    }
+  } else {
+    notes_received++;
+    //p_fill(CHSV(velocity*2, velocity, notes_received%255), notes_received++, 2); //channel + (pitch%12), 1); 
+    p_fill(CRGB::Green, pitch%STRIP_NUM_PIXELS, 1); //++, 2); //channel + (pitch%12), 1); 
+    //if (!playing) {
+      p_show();
+    //}
   }
 }
 
@@ -94,19 +112,14 @@ void handleNoteOff(byte channel, byte pitch, byte velocity) {
 
 
 void setup() {
-  Serial.begin(9600);
-  Serial.println("resetting");
+  //Serial.begin(38400);
+  //Serial.println("resetting");
   
   // put your setup code here, to run once:
 
 #ifdef ENABLE_PIXELS
   setup_pixels();
 #endif
-
-#ifdef BUTTON_PIN
-  //pinMode(BUTTON_PIN, INPUT_PULLUP);
-#endif
-
 
   // Initiate MIDI communications, listen to all channels
   MIDI.begin(MIDI_CHANNEL_OMNI);
@@ -133,10 +146,13 @@ void loop() {
 
   MIDI.read();
 
-  playing = true;
+  //playing = true;
   if (playing) {
-    Serial.println("playing!");
+    //Serial.println("playing!");
+    //wait(1000);
+    //delay(1000);
     doScene[current_scene]();
+    //demo_sequence();
     playing = false;  // stop playing after one interation of sequence
     p_clear();
     p_show();

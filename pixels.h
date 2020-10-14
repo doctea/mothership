@@ -1,7 +1,7 @@
 #include <FastLED.h>
 
-#define STRIP_PIN A0
-#define STRIP_NUM_PIXELS 128 //144
+#define STRIP_PIN 9 //A0
+#define STRIP_NUM_PIXELS 16 //128 //144
 
 CRGB leds[STRIP_NUM_PIXELS];
 CRGB leds_last[STRIP_NUM_PIXELS];
@@ -9,7 +9,8 @@ CRGB leds_last[STRIP_NUM_PIXELS];
 void fadeall() { for(int i = 0; i < STRIP_NUM_PIXELS; i++) { leds[i].nscale8(250); } }
 
 void setup_pixels() {
-  LEDS.addLeds<WS2812,STRIP_PIN,RGB>(leds,STRIP_NUM_PIXELS);
+  //LEDS.addLeds<WS2812,STRIP_PIN,RGB>(leds,STRIP_NUM_PIXELS);
+  LEDS.addLeds<NEOPIXEL,STRIP_PIN>(leds,STRIP_NUM_PIXELS);
   LEDS.setBrightness(255);
 
   FastLED.clear(true);
@@ -17,7 +18,7 @@ void setup_pixels() {
   // First slide the led in one direction
   static uint8_t hue = 0;
 
-  /*for(int i = 0; i < STRIP_NUM_PIXELS; i++) {
+  for(int i = 0; i < STRIP_NUM_PIXELS; i++) {
     // Set the i'th led to red 
     leds[i] = CHSV(hue++, 255, 255);
     // Show the leds
@@ -27,7 +28,7 @@ void setup_pixels() {
     fadeall();
     // Wait a little bit before we loop around and do it again
     delay(10);
-  }*/
+  }
   
 }
 
@@ -36,7 +37,7 @@ void update_pixel(byte index, CRGB rgb) {
 }
 
 void p_fill(CRGB colour, int position, byte span) {
-  for (int i = position ; i < position + span ; i++) {
+  for (int i = position ; i < constrain(position + span,0,STRIP_NUM_PIXELS) ; i++) {
     leds[i] = colour;
   }
 }
