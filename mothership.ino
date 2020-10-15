@@ -84,9 +84,13 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
           }
     }
   } else {
+    // turn the light on
     notes_received++;
     //p_fill(CHSV(velocity*2, velocity, notes_received%255), notes_received++, 2); //channel + (pitch%12), 1); 
-    p_fill(CRGB::Green, pitch%STRIP_NUM_PIXELS, 1); //++, 2); //channel + (pitch%12), 1); 
+    if (velocity==255) 
+      p_fill(CRGB::White, pitch%STRIP_NUM_PIXELS, 1); //++, 2); //channel + (pitch%12), 1); 
+    else
+      p_fill(CHSV(velocity*2, 255, 255), pitch%STRIP_NUM_PIXELS, 1); //++, 2); //channel + (pitch%12), 1); 
     //if (!playing) {
       p_show();
     //}
@@ -108,6 +112,30 @@ void handleNoteOff(byte channel, byte pitch, byte velocity) {
   }
 
   last_input_at = millis();*/
+
+  if (pitch>=MIDI_NOTE_START) {
+    /*pitch -= MIDI_NOTE_START;  // so we can use C5 upwards as 0/1/2 are a bit fiddly...
+    //wait(1000);
+    if (//true || 
+        //channel==10 && // use channel 10 (drums) to trigger the preprogrammed sequences
+        pitch < SCENES_COUNT  // and is a valid sequence number
+        ) {
+          if (!playing) {
+            current_scene = pitch;
+            playing = true;
+          } else {
+            playing = false;  // stop if already ongoing
+          }
+    }*/
+  } else {
+    // turn the light off
+    //notes_received++;
+    //p_fill(CHSV(velocity*2, velocity, notes_received%255), notes_received++, 2); //channel + (pitch%12), 1); 
+    p_fill(CRGB::Black, pitch%STRIP_NUM_PIXELS, 1); //++, 2); //channel + (pitch%12), 1); 
+    //if (!playing) {
+      p_show();
+    //}
+  }
 }
 
 
@@ -153,7 +181,7 @@ void loop() {
     //delay(1000);
     doScene[current_scene]();
     //demo_sequence();
-    playing = false;  // stop playing after one interation of sequence
+    playing = false;  // stop playing after one iteration of sequence
     p_clear();
     p_show();
   } else {

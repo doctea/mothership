@@ -1,12 +1,15 @@
 #include <FastLED.h>
 
-#define STRIP_PIN 9 //A0
-#define STRIP_NUM_PIXELS 16 //128 //144
+#define STRIP_PIN A0
+#define STRIP_NUM_PIXELS 128 //144
 
 CRGB leds[STRIP_NUM_PIXELS];
 CRGB leds_last[STRIP_NUM_PIXELS];
 
 void fadeall() { for(int i = 0; i < STRIP_NUM_PIXELS; i++) { leds[i].nscale8(250); } }
+
+void p_clear();
+void p_show();
 
 void setup_pixels() {
   //LEDS.addLeds<WS2812,STRIP_PIN,RGB>(leds,STRIP_NUM_PIXELS);
@@ -29,7 +32,8 @@ void setup_pixels() {
     // Wait a little bit before we loop around and do it again
     delay(10);
   }
-  
+  p_clear();
+  p_show();
 }
 
 void update_pixel(byte index, CRGB rgb) {

@@ -12,6 +12,7 @@ void demo_sequence() {
     fadeall();
     // Wait a little bit before we loop around and do it again
     wait(100);
+    if (!playing) return; // return early if told to stop
   }
   return;
 }
