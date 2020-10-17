@@ -1,10 +1,21 @@
 #include <FastLED.h>
 
+//#define RGB_MODE
+
+#ifdef RGBW_MODE
+#include "FastLED_RGBW.h"
+#endif
+
 #define STRIP_PIN A0
 #define STRIP_NUM_PIXELS 128 //144
 
+#ifdef RGBW_MODE
+CRGBW leds[STRIP_NUM_PIXELS];
+#else
 CRGB leds[STRIP_NUM_PIXELS];
+#endif
 CRGB leds_last[STRIP_NUM_PIXELS];
+CRGB *ledsRGB = (CRGB *) &leds[0];
 
 void fadeall() { for(int i = 0; i < STRIP_NUM_PIXELS; i++) { leds[i].nscale8(250); } }
 
@@ -13,7 +24,11 @@ void p_show();
 
 void setup_pixels() {
   //LEDS.addLeds<WS2812,STRIP_PIN,RGB>(leds,STRIP_NUM_PIXELS);
+#ifdef RGBW_MODE
+  LEDS.addLeds<WS2812B, STRIP_PIN, RGB>(ledsRGB, getRGBWsize(STRIP_NUM_PIXELS));  //use both the CRGB pointer and the size function "getRGBWsize" in the FastLED_RGBW helper file
+#else
   LEDS.addLeds<NEOPIXEL,STRIP_PIN>(leds,STRIP_NUM_PIXELS);
+#endif
   LEDS.setBrightness(255);
 
   FastLED.clear(true);
