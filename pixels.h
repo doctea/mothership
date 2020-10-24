@@ -1,6 +1,6 @@
 #include <FastLED.h>
 
-//#define RGB_MODE
+//#define RGBW_MODE
 
 #ifdef RGBW_MODE
 #include "FastLED_RGBW.h"
