@@ -1,4 +1,17 @@
-#define SCENES_COUNT  2
+#define SCENES_COUNT  3
+
+// stuff for steppers
+#include <AccelStepper.h>
+// PIN LAYOUT
+AccelStepper stepper1(AccelStepper::FULL4WIRE, 22, 24, 23, 25);
+AccelStepper stepper2(AccelStepper::FULL4WIRE, 26, 28, 27, 29);
+AccelStepper stepper3(AccelStepper::FULL4WIRE, 30, 32, 31, 33);
+AccelStepper stepper4(AccelStepper::FULL4WIRE, 34, 36, 35, 37);
+AccelStepper stepper5(AccelStepper::FULL4WIRE, 38, 40, 39, 41);
+
+
+
+////// sequences start here
 
 void demo_sequence() {
   for(int i = 0; i < STRIP_NUM_PIXELS; i++) {
@@ -59,8 +72,45 @@ void white_strips() {
 }
 
 
+void stepper_test() {
+    // set up the initial conditions
+    stepper1.setMaxSpeed(250.0);
+    stepper1.setAcceleration(100.0);
+    stepper1.moveTo(44300);
+
+    stepper2.setMaxSpeed(250.0);
+    stepper2.setAcceleration(100.0);
+    stepper2.moveTo(44300);
+
+    stepper3.setMaxSpeed(250.0);
+    stepper3.setAcceleration(100.0);
+    stepper3.moveTo(44300);
+
+    stepper4.setMaxSpeed(250.0);
+    stepper4.setAcceleration(100.0);
+    stepper4.moveTo(44300);
+
+    stepper5.setMaxSpeed(250.0);
+    stepper5.setAcceleration(100.0);
+    stepper5.moveTo(44300);
+
+    int duration = 2000;  // number of milliseconds to run the sequence
+    int start = millis();
+    while (millis()-start < duration) {
+      stepper1.run();
+      stepper2.run();
+      stepper3.run(); 
+      stepper4.run(); 
+      stepper5.run(); 
+      wait(1);      
+      if (!playing) return;
+    }
+}
+
+
 
 void (*doScene[SCENES_COUNT])() {
   white_strips,
-  demo_sequence
+  demo_sequence,
+  stepper_test
 };

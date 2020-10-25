@@ -1,6 +1,6 @@
 #include <FastLED.h>
 
-//#define RGBW_MODE
+//#define RGBW_MODE // uncomment this line to activate RGBW mode -- doesn't actually compile yet !!
 
 #ifdef RGBW_MODE
 #include "FastLED_RGBW.h"
